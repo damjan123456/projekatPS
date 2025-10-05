@@ -1,0 +1,63 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package kontroleri;
+
+import com.sun.java.accessibility.util.AWTEventMonitor;
+import forme.LoginForma;
+import glavnikontroler.GlavniKontroler;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JOptionPane;
+import komunikacija.Komunikacija;
+import model.Bibliotekar;
+
+/**
+ *
+ * @author damja
+ */
+public class LoginController {
+    private final LoginForma lf;
+
+    public LoginController(LoginForma lf) {
+        this.lf = lf;
+        addActionListener();
+    }
+
+    private void addActionListener() {
+        lf.loginAddActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                prijava(e);
+            }
+
+            private void prijava(ActionEvent e) {
+                String korisnickoIme = lf.getjTextFieldKorisnickoIme().getText().trim();
+                String sifra = String.valueOf(lf.getjPasswordFieldSifra().getPassword());
+                
+                Komunikacija.getInstanca().konekcija();
+                Bibliotekar ulogovani = Komunikacija.getInstanca().login(korisnickoIme,sifra);
+                
+                if (ulogovani == null){
+                    JOptionPane.showMessageDialog(lf, "Korisnicko ime i sifra nisu ispravni","GRESKA",JOptionPane.ERROR_MESSAGE);
+                }else{
+                    GlavniKontroler.getInstanca().setUlogovani(ulogovani);
+                    JOptionPane.showMessageDialog(lf, "Korisnicko ime i sifra su ispravni","USPEH",JOptionPane.INFORMATION_MESSAGE);
+                    try{
+                        GlavniKontroler.getInstanca().otvoriGlavnuFormu();
+                    }catch (Exception ex){
+                        JOptionPane.showMessageDialog(lf, "Ne moze da se otvori glavna forma i meni","GRESKA",JOptionPane.ERROR_MESSAGE);
+                    }
+                    lf.dispose();
+                }
+            }
+        });
+    }
+
+    public void otvoriFormu() {
+        lf.setVisible(true);
+    }
+    
+    
+}
